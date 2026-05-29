@@ -12,8 +12,9 @@ import io
 from sqlalchemy import func
 from fastapi import Query
 from datetime import date
-from ai import model
+from ai import generate_ai_response
 from dependencies import get_current_user
+from db import SessionLocal
 
 
 
@@ -477,9 +478,9 @@ User question:
 {message}
 """
 
-    response = model.generate_content(context)
+    response = generate_ai_response(context)
 
-    return {"response": response.text}
+    return {"response": response}
 
 
 @router.get("/ai/report")
@@ -513,9 +514,9 @@ Category spending:
 Make it short, clear, and user friendly.
 """
 
-    response = model.generate_content(prompt)
+    response = generate_ai_response(prompt)
 
-    return {"report": response.text}
+    return {"report": response}
 
 
 @router.get("/ai/budget-suggestions")
@@ -542,6 +543,6 @@ Return:
 - short explanation
 """
 
-    response = model.generate_content(prompt)
+    response = generate_ai_response(prompt)
 
-    return {"suggestions": response.text}
+    return {"suggestions": response}
