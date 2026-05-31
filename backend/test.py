@@ -1,8 +1,6 @@
-import google.generativeai as genai
+from db import Base, engine
+import models
 
-genai.configure(api_key="AIzaSyCunPVv3x3bwBwicCWd3BBEXbBmmFNMipY")
+load_dotenv()
 
-models = genai.list_models()
-
-for m in models:
-    print(m.name)
+Base.metadata.create_all(bind=engine)
