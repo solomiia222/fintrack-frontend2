@@ -453,4 +453,53 @@ th {
   .edit-actions button {
     width: 100%;
   }
+
+  .auth-choice-card button {
+  margin-bottom: 12px;
+}
+
+.secondary-auth-button {
+  background-color: white !important;
+  color: #4f46e5 !important;
+  border: 1px solid #4f46e5 !important;
+}
+
+.secondary-auth-button:hover {
+  background-color: #eef2ff !important;
+}
+
+.auth-link-text {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.auth-link-text span {
+  color: #4f46e5;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-link-text span:hover {
+  text-decoration: underline;
+}
+
+.auth-link-text {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.auth-link-text span {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-link-text span:hover {
+  color: #1d4ed8;
+}
 }

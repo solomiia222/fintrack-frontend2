@@ -4,96 +4,54 @@ import { useNavigate } from "react-router-dom";
 function Login() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    surname: "",
+  const [loginData, setLoginData] = useState({
     email: "",
-    phone: "",
-    bankName: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setLoginData({
+      ...loginData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleRegister = () => {
-    if (
-      !formData.name ||
-      !formData.surname ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.bankName ||
-      !formData.password
-    ) {
-      alert("Please fill in all fields");
+  const handleLogin = () => {
+    const savedUser = JSON.parse(localStorage.getItem("registeredUser"));
+
+    if (!savedUser) {
+      alert("No registered user found. Please register first.");
+      navigate("/register");
       return;
     }
 
-    localStorage.setItem("user", JSON.stringify(formData));
-
-    navigate("/");
-    window.location.reload();
+    if (
+      loginData.email === savedUser.email &&
+      loginData.password === savedUser.password
+    ) {
+      localStorage.setItem("user", JSON.stringify(savedUser));
+      navigate("/");
+      window.location.reload();
+    } else {
+      alert("Wrong email or password");
+    }
   };
 
   return (
     <div className="login-page">
       <div className="login-card">
-        <h2>Create your FinTrack account</h2>
+        <h2>Login to FinTrack</h2>
 
         <p className="login-subtitle">
-          Enter your personal and banking information to continue.
+          Enter your email and password to access your dashboard.
         </p>
-
-        <div className="form-group">
-          <label>Name</label>
-          <input
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Surname</label>
-          <input
-            name="surname"
-            type="text"
-            value={formData.surname}
-            onChange={handleChange}
-          />
-        </div>
 
         <div className="form-group">
           <label>Email address</label>
           <input
             name="email"
             type="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Phone number</label>
-          <input
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Bank name</label>
-          <input
-            name="bankName"
-            type="text"
-            value={formData.bankName}
+            value={loginData.email}
             onChange={handleChange}
           />
         </div>
@@ -103,12 +61,17 @@ function Login() {
           <input
             name="password"
             type="password"
-            value={formData.password}
+            value={loginData.password}
             onChange={handleChange}
           />
         </div>
 
-        <button onClick={handleRegister}>Register and continue</button>
+        <button onClick={handleLogin}>Login</button>
+
+        <p className="auth-link-text">
+          Don’t have an account?{" "}
+          <span onClick={() => navigate("/register")}>Register here</span>
+        </p>
       </div>
     </div>
   );

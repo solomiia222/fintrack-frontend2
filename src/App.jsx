@@ -6,6 +6,8 @@ import Transactions from "./pages/Transactions";
 import Budgets from "./pages/Budgets";
 import Insights from "./pages/Insights";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import AuthChoice from "./pages/AuthChoice";
 import Account from "./pages/Account";
 
 function App() {
@@ -19,33 +21,43 @@ function App() {
         <main className={user ? "main-content" : ""}>
           <Routes>
             <Route
+              path="/start"
+              element={user ? <Navigate to="/" /> : <AuthChoice />}
+            />
+
+            <Route
+              path="/register"
+              element={user ? <Navigate to="/" /> : <Register />}
+            />
+
+            <Route
               path="/login"
               element={user ? <Navigate to="/" /> : <Login />}
             />
 
             <Route
               path="/"
-              element={user ? <Dashboard /> : <Navigate to="/login" />}
+              element={user ? <Dashboard /> : <Navigate to="/start" />}
             />
 
             <Route
               path="/transactions"
-              element={user ? <Transactions /> : <Navigate to="/login" />}
+              element={user ? <Transactions /> : <Navigate to="/start" />}
             />
 
             <Route
               path="/budgets"
-              element={user ? <Budgets /> : <Navigate to="/login" />}
+              element={user ? <Budgets /> : <Navigate to="/start" />}
             />
 
             <Route
               path="/insights"
-              element={user ? <Insights /> : <Navigate to="/login" />}
+              element={user ? <Insights /> : <Navigate to="/start" />}
             />
 
             <Route
               path="/account"
-              element={user ? <Account /> : <Navigate to="/login" />}
+              element={user ? <Account /> : <Navigate to="/start" />}
             />
           </Routes>
         </main>
