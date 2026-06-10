@@ -1,42 +1,77 @@
-const API_URL = "https://fintrack-frontend2.onrender.com";
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://fintrack-frontend2.onrender.com";
 
 function getToken() {
   return localStorage.getItem("token");
 }
 
 function authHeaders() {
+  const token = getToken();
+
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
+}
+
+async function readResponse(response, fallbackMessage) {
+  let data = {};
+
+  try {
+    data = await response.json();
+  } catch {
+    // Backend did not return JSON
+  }
+
+  if (!response.ok) {
+    let errorMessage = fallbackMessage;
+
+    if (typeof data.detail === "string") {
+      errorMessage = data.detail;
+    } else if (Array.isArray(data.detail)) {
+      errorMessage = data.detail
+        .map((error) => error.msg || "Invalid data")
+        .join(", ");
+    } else if (typeof data.message === "string") {
+      errorMessage = data.message;
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  return data;
 }
 
 export async function registerUser(formData) {
   const response = await fetch(`${API_URL}/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
-      first_name: formData.name,
-      last_name: formData.surname,
-      phone_number: formData.phone,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      phone_number: formData.phone_number,
       email: formData.email,
       password: formData.password,
     }),
   });
 
-  if (!response.ok) throw new Error("Registration failed");
-  return response.json();
+  return readResponse(response, "Registration failed");
 }
 
 export async function loginUser(loginData) {
   const response = await fetch(`${API_URL}/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(loginData),
   });
 
-  if (!response.ok) throw new Error("Wrong email or password");
-  return response.json();
+  return readResponse(response, "Wrong email or password");
 }
 
 export async function getTransactions() {
@@ -44,8 +79,7 @@ export async function getTransactions() {
     headers: authHeaders(),
   });
 
-  if (!response.ok) throw new Error("Failed to load transactions");
-  return response.json();
+  return readResponse(response, "Failed to load transactions");
 }
 
 export async function createTransaction(transaction) {
@@ -55,8 +89,32 @@ export async function createTransaction(transaction) {
     body: JSON.stringify(transaction),
   });
 
-  if (!response.ok) throw new Error("Failed to create transaction");
-  return response.json();
+  return readResponse(response, "Failed to create transaction");
+}
+
+export async function updateTransaction(transactionId, transaction) {
+  const response = await fetch(
+    `${API_URL}/transactions/${transactionId}`,
+    {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify(transaction),
+    }
+  );
+
+  return readResponse(response, "Failed to update transaction");
+}
+
+export async function deleteTransaction(transactionId) {
+  const response = await fetch(
+    `${API_URL}/transactions/${transactionId}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(),
+    }
+  );
+
+  return readResponse(response, "Failed to delete transaction");
 }
 
 export async function getBudgetAnalytics() {
@@ -64,8 +122,7 @@ export async function getBudgetAnalytics() {
     headers: authHeaders(),
   });
 
-  if (!response.ok) throw new Error("Failed to load budgets");
-  return response.json();
+  return readResponse(response, "Failed to load budgets");
 }
 
 export async function saveBudget(category, monthlyLimit) {
@@ -78,8 +135,7 @@ export async function saveBudget(category, monthlyLimit) {
     }),
   });
 
-  if (!response.ok) throw new Error("Failed to save budget");
-  return response.json();
+  return readResponse(response, "Failed to save budget");
 }
 
 export async function getPrediction() {
@@ -87,8 +143,7 @@ export async function getPrediction() {
     headers: authHeaders(),
   });
 
-  if (!response.ok) throw new Error("Failed to load prediction");
-  return response.json();
+  return readResponse(response, "Failed to load prediction");
 }
 
 export async function getMonthlyAnalytics() {
@@ -96,9 +151,7 @@ export async function getMonthlyAnalytics() {
     headers: authHeaders(),
   });
 
-  if (!response.ok) throw new Error("Failed to load monthly analytics");
-
-  return response.json();
+  return readResponse(response, "Failed to load monthly analytics");
 }
 
 export async function getAnalytics() {
@@ -106,21 +159,22 @@ export async function getAnalytics() {
     headers: authHeaders(),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to load category analytics");
-  }
-
-  return response.json();
+  return readResponse(response, "Failed to load category analytics");
 }
 
 export async function getAiReport() {
-  return {
-    report: "AI reporting not implemented"
-  };
+  const response = await fetch(`${API_URL}/ai/report`, {
+    headers: authHeaders(),
+  });
+
+  return readResponse(response, "Failed to load AI report");
 }
 
 export async function getBudgetSuggestions() {
-  return {
-    suggestions: []
-  };
+  const response = await fetch(`${API_URL}/ai/budget-suggestions`, {
+    headers: authHeaders(),
+  });
+
+  return readResponse(response, "Failed to load budget suggestions");
 }
+

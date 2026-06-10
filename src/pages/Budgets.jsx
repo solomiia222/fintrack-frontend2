@@ -7,6 +7,15 @@ function Budgets() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedBudgets, setEditedBudgets] = useState([]);
 
+  const [newBudget, setNewBudget] = useState({
+    category: "",
+    limit: "",
+  });
+
+  useEffect(() => {
+    loadBudgets();
+  }, []);
+
   const loadBudgets = async () => {
     try {
       const data = await getBudgetAnalytics();
@@ -24,9 +33,32 @@ function Budgets() {
     }
   };
 
-  useEffect(() => {
-    loadBudgets();
-  }, []);
+  const handleNewBudgetChange = (e) => {
+    setNewBudget({
+      ...newBudget,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleAddBudget = async () => {
+    if (!newBudget.category || !newBudget.limit) {
+      alert("Please enter category and monthly limit");
+      return;
+    }
+
+    try {
+      await saveBudget(newBudget.category, newBudget.limit);
+
+      setNewBudget({
+        category: "",
+        limit: "",
+      });
+
+      loadBudgets();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   const handleEditClick = () => {
     setEditedBudgets(budgets);
@@ -73,16 +105,47 @@ function Budgets() {
           </p>
         </div>
 
-        {!isEditing && (
+        {!isEditing && budgets.length > 0 && (
           <button className="edit-button" onClick={handleEditClick}>
             Edit limits
           </button>
         )}
       </div>
 
+      <div className="table-card" style={{ marginBottom: "28px" }}>
+        <h3>Add budget</h3>
+
+        <div className="form-group">
+          <label>Category</label>
+          <input
+            name="category"
+            type="text"
+            placeholder="Groceries, Housing, Transport..."
+            value={newBudget.category}
+            onChange={handleNewBudgetChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Monthly limit</label>
+          <input
+            name="limit"
+            type="number"
+            placeholder="300"
+            value={newBudget.limit}
+            onChange={handleNewBudgetChange}
+          />
+        </div>
+
+        <button className="primary-button" onClick={handleAddBudget}>
+          Add budget
+        </button>
+      </div>
+
       {budgets.length === 0 && (
         <p className="page-subtitle">
-          No budgets yet. Add transactions first, then create budgets.
+          No budgets yet. Add a budget above for an existing transaction
+          category.
         </p>
       )}
 

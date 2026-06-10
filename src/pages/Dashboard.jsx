@@ -1,32 +1,57 @@
+import { useEffect, useState } from "react";
 import SummaryCard from "../components/SummaryCard";
 import SpendingPieChart from "../components/SpendingPieChart";
 import MonthlyLineChart from "../components/MonthlyLineChart";
-import { transactions, budgets } from "../data/mockData";
+import { getTransactions, getPrediction } from "../api/api";
 
 function Dashboard() {
-  const totalSpending = transactions.reduce((sum, item) => sum + item.amount, 0);
-  const totalBudget = budgets.reduce((sum, item) => sum + item.limit, 0);
-  const remainingBudget = totalBudget - totalSpending;
+  const [transactions, setTransactions] = useState([]);
+  const [predictedSpending, setPredictedSpending] = useState(0);
 
-  // 🔥 TOP CATEGORY
-  const categoryMap = {};
-  transactions.forEach((t) => {
-    if (!categoryMap[t.category]) {
-      categoryMap[t.category] = 0;
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      const transactionsData = await getTransactions();
+      setTransactions(Array.isArray(transactionsData) ? transactionsData : []);
+
+      const predictionData = await getPrediction();
+      setPredictedSpending(
+        Number(
+          predictionData.predicted_next_month_spending ||
+            predictionData.prediction ||
+            0
+        )
+      );
+    } catch (error) {
+      setTransactions([]);
+      setPredictedSpending(0);
+      alert(error.message);
     }
-    categoryMap[t.category] += t.amount;
-  });
+  };
 
-  const topCategory = Object.keys(categoryMap).reduce((a, b) =>
-    categoryMap[a] > categoryMap[b] ? a : b
+  const totalSpending = transactions.reduce(
+    (sum, item) => sum + Number(item.amount || 0),
+    0
   );
 
-  // 🔥 FAKE AI PREDICTION
-  const predictedSpending = totalSpending * 1.2;
+  const categoryTotals = transactions.reduce((acc, item) => {
+    const category = item.category || "Other";
+    acc[category] = (acc[category] || 0) + Number(item.amount || 0);
+    return acc;
+  }, {});
+
+  const topCategory =
+    Object.keys(categoryTotals).length > 0
+      ? Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0][0]
+      : "No data";
 
   return (
     <div>
       <h1>Dashboard</h1>
+
       <p className="page-subtitle">
         Overview of your financial activity and AI-based predictions.
       </p>
@@ -35,25 +60,37 @@ function Dashboard() {
         <SummaryCard
           title="Total Spending"
           value={`€${totalSpending.toFixed(2)}`}
-          description="Current monthly spending"
+          description={
+            transactions.length > 0
+              ? "Current spending from backend"
+              : "No transactions yet"
+          }
         />
 
         <SummaryCard
-          title="Remaining Budget"
-          value={`€${remainingBudget.toFixed(2)}`}
-          description="Available budget this month"
+          title="Transactions"
+          value={transactions.length}
+          description="Number of recorded transactions"
         />
 
         <SummaryCard
           title="Predicted Spending"
           value={`€${predictedSpending.toFixed(2)}`}
-          description="AI forecast for month end"
+          description={
+            transactions.length > 0
+              ? "Backend prediction for next month"
+              : "Prediction needs transaction data"
+          }
         />
 
         <SummaryCard
           title="Top Category"
           value={topCategory}
-          description="Highest spending category"
+          description={
+            transactions.length > 0
+              ? "Highest spending category"
+              : "No category data yet"
+          }
         />
       </div>
 
