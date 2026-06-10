@@ -7,7 +7,6 @@ class UserCreate(BaseModel):
     first_name: str
     last_name: str
     phone_number: str
-
     email: EmailStr
     password: str
 
@@ -23,7 +22,7 @@ class Token(BaseModel):
 
 class TransactionCreate(BaseModel):
     amount: float
-    category: str | None = None
+    category: Optional[str] = None
     description: str
     date: date
 
@@ -45,7 +44,7 @@ class BudgetCreate(BaseModel):
 
 
 class TransactionUpdate(BaseModel):
-    amount: float | None = None
-    description: str | None = None
+    amount: Optional[float] = None
+    description: Optional[str] = None
     date: Optional[date] = None
-    category: str | None = None
+    category: Optional[str] = None

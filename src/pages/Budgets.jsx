@@ -1,16 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BudgetProgress from "../components/BudgetProgress";
-import { budgets as defaultBudgets } from "../data/mockData";
+import { getBudgetAnalytics, saveBudget } from "../api/api";
 
 function Budgets() {
-  const savedBudgets = localStorage.getItem("budgets");
-
-  const [budgets, setBudgets] = useState(
-    savedBudgets ? JSON.parse(savedBudgets) : defaultBudgets
-  );
-
+  const [budgets, setBudgets] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedBudgets, setEditedBudgets] = useState(budgets);
+  const [editedBudgets, setEditedBudgets] = useState([]);
+
+  const loadBudgets = async () => {
+    try {
+      const data = await getBudgetAnalytics();
+
+      const formatted = data.map((item) => ({
+        category: item.category,
+        spent: Number(item.spent),
+        limit: Number(item.monthly_limit),
+      }));
+
+      setBudgets(formatted);
+      setEditedBudgets(formatted);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    loadBudgets();
+  }, []);
 
   const handleEditClick = () => {
     setEditedBudgets(budgets);
@@ -29,15 +45,17 @@ function Budgets() {
     setEditedBudgets(updated);
   };
 
-  const handleSave = () => {
-    const normalizedBudgets = editedBudgets.map((budget) => ({
-      ...budget,
-      limit: Number(budget.limit) || 0,
-    }));
+  const handleSave = async () => {
+    try {
+      for (const budget of editedBudgets) {
+        await saveBudget(budget.category, budget.limit);
+      }
 
-    setBudgets(normalizedBudgets);
-    localStorage.setItem("budgets", JSON.stringify(normalizedBudgets));
-    setIsEditing(false);
+      setIsEditing(false);
+      loadBudgets();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleCancel = () => {
@@ -61,6 +79,12 @@ function Budgets() {
           </button>
         )}
       </div>
+
+      {budgets.length === 0 && (
+        <p className="page-subtitle">
+          No budgets yet. Add transactions first, then create budgets.
+        </p>
+      )}
 
       <div className="budget-grid">
         {(isEditing ? editedBudgets : budgets).map((budget) => (

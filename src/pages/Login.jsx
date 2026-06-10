@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -16,26 +17,24 @@ function Login() {
     });
   };
 
-  const handleLogin = () => {
-    const savedUser = JSON.parse(localStorage.getItem("registeredUser"));
+  const handleLogin = async () => {
+  try {
+    const data = await loginUser(loginData);
 
-    if (!savedUser) {
-      alert("No registered user found. Please register first.");
-      navigate("/register");
-      return;
-    }
+    localStorage.setItem("token", data.access_token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        email: loginData.email,
+      })
+    );
 
-    if (
-      loginData.email === savedUser.email &&
-      loginData.password === savedUser.password
-    ) {
-      localStorage.setItem("user", JSON.stringify(savedUser));
-      navigate("/");
-      window.location.reload();
-    } else {
-      alert("Wrong email or password");
-    }
-  };
+    navigate("/");
+    window.location.reload();
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
   return (
     <div className="login-page">

@@ -1,21 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from sqlalchemy import text, func
+from fastapi.responses import StreamingResponse
+from datetime import date
+from typing import Optional
 import re
-import models, schemas
+import csv
+import io
+
+import models
+import schemas
 from dependencies import get_db, get_current_user
 from auth import hash_password, verify_password, create_access_token
 from services import categorize
-from fastapi.responses import StreamingResponse
-import csv
-import io
-from sqlalchemy import func
-from fastapi import Query
-from datetime import date
 from ai import generate_ai_response
-from dependencies import get_current_user
 from db import SessionLocal
-
 
 
 router = APIRouter()
@@ -23,44 +22,25 @@ router = APIRouter()
 
 @router.post("/register")
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
-
-    # EMAIL VALIDATION
     email_regex = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 
     if not re.match(email_regex, user.email):
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid email format"
-        )
+        raise HTTPException(status_code=400, detail="Invalid email format")
 
-    # PASSWORD VALIDATION
     password = user.password
 
     if len(password) < 8:
-        raise HTTPException(
-            status_code=400,
-            detail="Password must be at least 8 characters long"
-        )
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
 
     if not re.search(r"[A-Z]", password):
-        raise HTTPException(
-            status_code=400,
-            detail="Password must contain at least one uppercase letter"
-        )
+        raise HTTPException(status_code=400, detail="Password must contain at least one uppercase letter")
 
     if not re.search(r"[a-z]", password):
-        raise HTTPException(
-            status_code=400,
-            detail="Password must contain at least one lowercase letter"
-        )
+        raise HTTPException(status_code=400, detail="Password must contain at least one lowercase letter")
 
     if not re.search(r"\d", password):
-        raise HTTPException(
-            status_code=400,
-            detail="Password must contain at least one number"
-        )
-    
-    # PHONE VALIDATION
+        raise HTTPException(status_code=400, detail="Password must contain at least one number")
+
     phone_regex = r"^\+\d{7,15}$"
 
     if not re.match(phone_regex, user.phone_number):
@@ -72,10 +52,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     existing = db.query(models.User).filter_by(email=user.email).first()
 
     if existing:
-        raise HTTPException(
-            status_code=400,
-            detail="User already exists"
-        )
+        raise HTTPException(status_code=400, detail="User already exists")
 
     new_user = models.User(
         first_name=user.first_name,
@@ -88,9 +65,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
 
-    return {
-        "message": "User created successfully"
-    }
+    return {"message": "User created successfully"}
 
 
 @router.post("/login", response_model=schemas.Token)
@@ -104,13 +79,11 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return {"access_token": token}
 
 
-# TRANSACTIONS
-
 @router.post("/transactions")
 def create_transaction(
     data: schemas.TransactionCreate,
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     category_name = data.category
 
@@ -118,6 +91,7 @@ def create_transaction(
         category_name = categorize(data.description)
 
     category = db.query(models.Category).filter_by(name=category_name).first()
+
     if not category:
         category = models.Category(name=category_name)
         db.add(category)
@@ -149,9 +123,9 @@ def create_transaction(
 def get_transactions(
     page: int = 1,
     limit: int = 10,
-    category: str | None = None,
+    category: Optional[str] = None,
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     query = db.query(models.Transaction).filter_by(user_id=user.id)
 
@@ -184,7 +158,7 @@ def update_transaction(
     transaction_id: int,
     data: schemas.TransactionUpdate,
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     transaction = db.query(models.Transaction).filter_by(
         id=transaction_id,
@@ -221,7 +195,7 @@ def update_transaction(
 def delete_transaction(
     transaction_id: int,
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     transaction = db.query(models.Transaction).filter_by(
         id=transaction_id,
@@ -237,12 +211,10 @@ def delete_transaction(
     return {"message": "Transaction deleted"}
 
 
-# ANALYTICS (VIEW)
-
 @router.get("/analytics/monthly")
 def monthly_analytics(
     db: Session = Depends(get_db),
-    user = Depends(get_current_user),
+    user=Depends(get_current_user),
     from_date: date = Query(None),
     to_date: date = Query(None)
 ):
@@ -273,7 +245,7 @@ def monthly_analytics(
 @router.get("/analytics/categories")
 def category_analytics(
     db: Session = Depends(get_db),
-    user = Depends(get_current_user),
+    user=Depends(get_current_user),
     from_date: date = Query(None),
     to_date: date = Query(None),
     page: int = 1,
@@ -282,8 +254,10 @@ def category_analytics(
     query = db.query(
         models.Category.name.label("category"),
         func.sum(models.Transaction.amount).label("total")
-    ).join(models.Transaction, models.Transaction.category_id == models.Category.id)\
-     .filter(models.Transaction.user_id == user.id)
+    ).join(
+        models.Transaction,
+        models.Transaction.category_id == models.Category.id
+    ).filter(models.Transaction.user_id == user.id)
 
     if from_date:
         query = query.filter(models.Transaction.date >= from_date)
@@ -291,8 +265,9 @@ def category_analytics(
     if to_date:
         query = query.filter(models.Transaction.date <= to_date)
 
-    query = query.group_by(models.Category.name)\
-                 .order_by(func.sum(models.Transaction.amount).desc())
+    query = query.group_by(models.Category.name).order_by(
+        func.sum(models.Transaction.amount).desc()
+    )
 
     total_items = query.count()
 
@@ -315,7 +290,7 @@ def category_analytics(
 @router.get("/analytics/budgets")
 def budget_analytics(
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     result = db.execute(text("""
         SELECT
@@ -334,12 +309,12 @@ def budget_analytics(
 
     return [dict(row._mapping) for row in result]
 
-# BUDGETS
+
 @router.post("/budgets")
 def create_budget(
     data: schemas.BudgetCreate,
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     category = db.query(models.Category).filter_by(name=data.category).first()
 
@@ -371,7 +346,7 @@ def create_budget(
 @router.get("/budgets")
 def get_budgets(
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     budgets = db.query(models.Budget).filter_by(user_id=user.id).all()
 
@@ -388,11 +363,10 @@ def get_budgets(
     return result
 
 
-# TABLE EXPORT
 @router.get("/export/csv")
 def export_csv(
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     transactions = db.query(models.Transaction).filter_by(user_id=user.id).all()
 
@@ -419,11 +393,11 @@ def export_csv(
         }
     )
 
-# AI PREDICTION
+
 @router.get("/predict/spending")
 def predict_spending(
     db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     result = db.execute(text("""
         SELECT
@@ -454,9 +428,8 @@ def predict_spending(
 def financial_coach(
     message: str,
     db: Session = Depends(lambda: SessionLocal()),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
-    # Get summary data
     total = db.query(func.sum(models.Transaction.amount))\
         .filter(models.Transaction.user_id == user.id).scalar() or 0
 
@@ -486,7 +459,7 @@ User question:
 @router.get("/ai/report")
 def monthly_report(
     db: Session = Depends(lambda: SessionLocal()),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     monthly = db.query(
         func.to_char(models.Transaction.date, "YYYY-MM").label("month"),
@@ -522,7 +495,7 @@ Make it short, clear, and user friendly.
 @router.get("/ai/budget-suggestions")
 def budget_suggestions(
     db: Session = Depends(lambda: SessionLocal()),
-    user = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
     categories = db.query(
         models.Category.name,

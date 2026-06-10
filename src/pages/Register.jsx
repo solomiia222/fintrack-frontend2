@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../api/api";
 
 function Register() {
   const navigate = useNavigate();
@@ -20,25 +21,26 @@ function Register() {
     });
   };
 
-  const handleRegister = () => {
-    if (
-      !formData.name ||
-      !formData.surname ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.bankName ||
-      !formData.password
-    ) {
-      alert("Please fill in all fields");
-      return;
-    }
+  const handleRegister = async () => {
+  if (
+    !formData.name ||
+    !formData.surname ||
+    !formData.email ||
+    !formData.phone ||
+    !formData.password
+  ) {
+    alert("Please fill in all required fields");
+    return;
+  }
 
-    localStorage.setItem("registeredUser", JSON.stringify(formData));
-    localStorage.setItem("user", JSON.stringify(formData));
-
-    navigate("/");
-    window.location.reload();
-  };
+  try {
+    await registerUser(formData);
+    alert("Registration successful. Please log in.");
+    navigate("/login");
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
   return (
     <div className="login-page">
