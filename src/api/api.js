@@ -90,3 +90,25 @@ export async function getPrediction() {
   if (!response.ok) throw new Error("Failed to load prediction");
   return response.json();
 }
+
+export async function getMonthlyAnalytics() {
+  const response = await fetch(`${API_URL}/analytics/monthly`, {
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) throw new Error("Failed to load monthly analytics");
+
+  return response.json();
+}
+
+export async function getAnalytics() {
+  const response = await fetch(`${API_URL}/analytics/categories`, {
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load category analytics");
+  }
+
+  return response.json();
+}

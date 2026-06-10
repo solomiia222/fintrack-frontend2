@@ -1,13 +1,32 @@
+import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
-import { budgets } from "../data/mockData";
+import { getAnalytics } from "../api/api";
 
 const COLORS = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444"];
 
 function SpendingPieChart() {
-  const data = budgets.map((budget) => ({
-    name: budget.category,
-    value: budget.spent,
-  }));
+  const [analytics, setAnalytics] = useState([]);
+
+  useEffect(() => {
+    loadAnalyticsData();
+  }, []);
+
+  const loadAnalyticsData = async () => {
+    try {
+      const analyticsData = await getAnalytics();
+      
+      const formattedData = analyticsData.data.map((item) => ({
+        name: item.category,
+        value: Number(item.total),
+      }));
+
+      setAnalytics(formattedData);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  
 
   return (
     <div className="chart-card">
@@ -15,13 +34,13 @@ function SpendingPieChart() {
 
       <PieChart width={350} height={280}>
         <Pie
-          data={data}
+          data={analytics}
           dataKey="value"
           nameKey="name"
           outerRadius={90}
           label
         >
-          {data.map((entry, index) => (
+          {analytics.map((entry, index) => (
             <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
