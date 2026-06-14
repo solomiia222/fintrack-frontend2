@@ -112,3 +112,15 @@ export async function getAnalytics() {
 
   return response.json();
 }
+
+export async function getAiReport() {
+  return {
+    report: "AI reporting not implemented"
+  };
+}
+
+export async function getBudgetSuggestions() {
+  return {
+    suggestions: []
+  };
+}
