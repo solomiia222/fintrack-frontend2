@@ -2,9 +2,6 @@ import os
 import random
 import time
 import google.generativeai as genai
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # =========================
 # 1. LOAD API KEYS
