@@ -24,8 +24,38 @@ export async function registerUser(formData) {
     }),
   });
 
-  if (!response.ok) throw new Error("Registration failed");
-  return response.json();
+  
+  const rawText = await response.text();
+  let data = {};
+  
+  try {
+    data = JSON.parse(rawText);
+  } catch (e) {
+    if (!response.ok) throw new Error(rawText || "Registration failed");
+  }
+
+  if (!response.ok) {
+    console.log("Backend error payload structure:", data);
+
+    if (data.detail) {
+      if (typeof data.detail === "string") {
+        throw new Error(data.detail);
+      }
+      if (Array.isArray(data.detail) && data.detail.length > 0) {
+      
+        const firstError = data.detail[0];
+        const msg = firstError.msg || firstError.message || JSON.stringify(firstError);
+        throw new Error(msg);
+      }
+      if (typeof data.detail === "object") {
+        throw new Error(JSON.stringify(data.detail));
+      }
+    }
+
+    throw new Error("Registration failed");
+  }
+
+  return data;
 }
 
 export async function loginUser(loginData) {
@@ -111,4 +141,16 @@ export async function getAnalytics() {
   }
 
   return response.json();
+}
+
+export async function getAiReport() {
+  return {
+    report: "AI reporting not implemented"
+  };
+}
+
+export async function getBudgetSuggestions() {
+  return {
+    suggestions: []
+  };
 }
