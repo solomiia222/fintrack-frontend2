@@ -13,6 +13,7 @@ function Register() {
     bankName: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,31 +23,29 @@ function Register() {
   };
 
   const handleRegister = async () => {
-  if (
-    !formData.name ||
-    !formData.surname ||
-    !formData.email ||
-    !formData.phone ||
-    !formData.password
-  ) {
-    alert("Please fill in all required fields");
-    return;
-  }
+    // Professional client-side validation guardrails
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
+      alert("Please fill in your name, email, and password to continue.");
+      return;
+    }
 
-  try {
-    await registerUser(formData);
-    alert("Registration successful. Please log in.");
-    navigate("/login");
-  } catch (error) {
-    alert(error.message);
-  }
-};
+    setLoading(true);
+    try {
+      await registerUser(formData);
+      alert("Registration successful! Please log in.");
+      navigate("/login");
+    } catch (error) {
+      // api.js now throws clean Error objects. We just display the message directly!
+      alert(error.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="login-page">
       <div className="login-card">
         <h2>Create your FinTrack account</h2>
-
         <p className="login-subtitle">
           Enter your personal and banking information to continue.
         </p>
@@ -56,6 +55,7 @@ function Register() {
           <input
             name="name"
             type="text"
+            disabled={loading}
             value={formData.name}
             onChange={handleChange}
           />
@@ -66,6 +66,7 @@ function Register() {
           <input
             name="surname"
             type="text"
+            disabled={loading}
             value={formData.surname}
             onChange={handleChange}
           />
@@ -76,6 +77,7 @@ function Register() {
           <input
             name="email"
             type="email"
+            disabled={loading}
             value={formData.email}
             onChange={handleChange}
           />
@@ -86,8 +88,10 @@ function Register() {
           <input
             name="phone"
             type="tel"
+            disabled={loading}
             value={formData.phone}
             onChange={handleChange}
+            placeholder="+49..."
           />
         </div>
 
@@ -96,6 +100,7 @@ function Register() {
           <input
             name="bankName"
             type="text"
+            disabled={loading}
             value={formData.bankName}
             onChange={handleChange}
           />
@@ -106,16 +111,24 @@ function Register() {
           <input
             name="password"
             type="password"
+            disabled={loading}
             value={formData.password}
             onChange={handleChange}
           />
         </div>
 
-        <button onClick={handleRegister}>Register and continue</button>
+        <button onClick={handleRegister} disabled={loading}>
+          {loading ? "Registering..." : "Register and continue"}
+        </button>
 
         <p className="auth-link-text">
-            Already have an account?{" "}
-            <span onClick={() => navigate("/login")}>Login here</span>
+          Already have an account?{" "}
+          <span 
+            onClick={() => !loading && navigate("/login")}
+            style={{ cursor: loading ? "not-allowed" : "pointer" }}
+          >
+            Login here
+          </span>
         </p>
       </div>
     </div>
