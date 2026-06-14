@@ -181,4 +181,24 @@
     right: 0;
     border-right-color: var(--border);
   }
+
+  .form-error {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.form-success {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #16a34a;
+  border-radius: 6px;
+  background-color: #dcfce7;
+  color: #15803d;
+  font-size: 14px;
+}
 }

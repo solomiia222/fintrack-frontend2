@@ -1,4 +1,3 @@
-
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://fintrack-frontend2.onrender.com";
@@ -177,4 +176,3 @@ export async function getBudgetSuggestions() {
 
   return readResponse(response, "Failed to load budget suggestions");
 }
-
