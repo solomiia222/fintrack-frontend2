@@ -148,7 +148,14 @@ export async function getAiReport() {
     report: "AI reporting not implemented"
   };
 }
+export async function getBudgets() {
+  const response = await fetch(`${API_URL}/budgets`, {
+    headers: authHeaders(),
+  });
 
+  if (!response.ok) throw new Error("Failed to load budgets");
+  return response.json();
+}
 export async function getBudgetSuggestions() {
   return {
     suggestions: []
