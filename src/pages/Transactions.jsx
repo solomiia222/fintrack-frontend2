@@ -10,6 +10,17 @@ function Transactions() {
     date: "",
   });
 
+  const CATEGORIES = [
+    "Food",
+    "Transport",
+    "Bills",
+    "Entertainment",
+    "Housing",
+    "Groceries",
+    "Other",
+    "Uncategorized",
+  ];
+
   const loadTransactions = async () => {
     try {
       const data = await getTransactions();
@@ -89,13 +100,18 @@ function Transactions() {
 
         <div className="form-group">
           <label>Category</label>
-          <input
+          <select
             name="category"
-            type="text"
-            placeholder="Groceries, Housing, Transport..."
-            value={formData.category}
-            onChange={handleChange}
-          />
+            value={newBudget.category}
+            onChange={handleNewBudgetChange}
+          >
+            <option value="">Select category</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">
