@@ -22,19 +22,17 @@ API_KEYS = [k for k in API_KEYS if k]
 # =========================
 # 2. MODEL POOL
 # =========================
-MODELS = [
-        # BEST QUALITY (use sparingly)
-    "gemini-2.5-pro",
-
-    # BALANCED (MAIN WORKHORSE)
+const MODELS = [
+    # BEST QUALITY (main reasoning / highest capability)
+    "gemini-3.5-flash",
+    "gemini-3-flash",
+    
+    # BALANCED (main workhorse)
     "gemini-2.5-flash",
-
-    # FAST / CHEAP (fallback)
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-
-    # STABLE LEGACY FALLBACK
-    "gemini-pro-latest",
+    
+    # FAST / CHEAP (high throughput fallback)
+    "gemini-2.5-flash-lite",
+    "gemini-3.1-flash-lite",
 ]
 
 
