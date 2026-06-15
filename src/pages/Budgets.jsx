@@ -12,6 +12,17 @@ function Budgets() {
     limit: "",
   });
 
+  const CATEGORIES = [
+    "Food",
+    "Transport",
+    "Bills",
+    "Entertainment",
+    "Housing",
+    "Groceries",
+    "Other",
+    "Uncategorized",
+  ];
+
   useEffect(() => {
     loadBudgets();
   }, []);
@@ -117,13 +128,18 @@ function Budgets() {
 
         <div className="form-group">
           <label>Category</label>
-          <input
+          <select
             name="category"
-            type="text"
-            placeholder="Groceries, Housing, Transport..."
             value={newBudget.category}
             onChange={handleNewBudgetChange}
-          />
+          >
+            <option value="">Select category</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">
