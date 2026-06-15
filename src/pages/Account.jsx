@@ -1,16 +1,29 @@
+import { useEffect, useState } from "react";
+import { getUserProfile } from "../api/api";
+
 function Account() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const data = await getUserProfile();
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   if (!user) {
-    return <p>No user data found.</p>;
+    return <p>Loading user data...</p>;
   }
 
   return (
     <div>
       <h1>Account</h1>
-      <p className="page-subtitle">
-        Personal information connected to this FinTrack profile.
-      </p>
 
       <div className="account-card">
         <div className="account-row">
@@ -32,7 +45,6 @@ function Account() {
           <span>Phone number</span>
           <strong>{user.phone}</strong>
         </div>
-
       </div>
     </div>
   );
