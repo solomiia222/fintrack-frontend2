@@ -178,16 +178,18 @@ export async function getBudgetSuggestions() {
 }
 
 export const sendChatMessage = async (message) => {
-  const response = await fetch(`${API_URL}/ai/coach`, {
+  const res = await fetch(`${API_URL}/ai/coach`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`
     },
-    body: JSON.stringify({ message })
+    body: JSON.stringify({
+      message: message
+    })
   });
 
-  return readResponse(response, "Chat failed");
+  return readResponse(res, "Chat failed");
 };
 
 export const getUserProfile = async () => {
