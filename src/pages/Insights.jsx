@@ -12,16 +12,18 @@ function Insights() {
   }, []);
 
   const loadInsights = async () => {
-    try {
-      const reportData = await getAiReport();
-      const suggestionsData = await getBudgetSuggestions();
+  try {
+    const [reportData, suggestionsData] = await Promise.all([
+      getAiReport(),
+      getBudgetSuggestions(),
+    ]);
 
-      setReport(reportData.report || "No report available yet.");
-      setSuggestions(suggestionsData.suggestions || "No suggestions available yet.");
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+    setReport(reportData.report || "No report available yet.");
+    setSuggestions(suggestionsData.suggestions || "No suggestions available yet.");
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
   return (
     <div>

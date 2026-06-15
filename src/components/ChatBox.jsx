@@ -1,6 +1,8 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { sendChatMessage } from "../api/api";
 
 function ChatBox() {
@@ -37,7 +39,10 @@ function ChatBox() {
         {messages.map((m, i) => (
           <div key={i} className={m.role}>
             {m.role === "bot" ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+              >
                 {m.text}
               </ReactMarkdown>
             ) : (
