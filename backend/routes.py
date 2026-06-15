@@ -15,7 +15,6 @@ from auth import hash_password, verify_password, create_access_token
 from services import categorize
 from ai import generate_ai_response
 from db import SessionLocal
-from pydantic import BaseModel
 
 
 router = APIRouter()
@@ -433,15 +432,13 @@ def predict_spending(
     }
 
 
-class ChatRequest(BaseModel):
-    message: str
-
 @router.post("/ai/coach")
 def financial_coach(
-    data: ChatRequest,
+    data: schemas.ChatRequest,
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    print("AI COACH ROUTE HIT")
     total = db.query(func.sum(models.Transaction.amount))\
         .filter(models.Transaction.user_id == user.id).scalar() or 0
 
@@ -468,6 +465,7 @@ User question:
         return {"response": response}
     except Exception as e:
         return {"response": "AI service temporarily unavailable."}
+    return {"response": response}
 
 
 @router.get("/ai/report")

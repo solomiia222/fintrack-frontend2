@@ -48,3 +48,7 @@ class TransactionUpdate(BaseModel):
     description: Optional[str] = None
     date: Optional[date] = None
     category: Optional[str] = None
+
+
+class ChatRequest(BaseModel):
+    message: str
