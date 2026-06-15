@@ -180,10 +180,7 @@ export async function getBudgetSuggestions() {
 export const sendChatMessage = async (message) => {
   const res = await fetch(`${API_URL}/ai/coach`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    },
+    headers: authHeaders(),
     body: JSON.stringify({
       message: message
     })
