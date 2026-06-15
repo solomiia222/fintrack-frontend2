@@ -438,7 +438,6 @@ def financial_coach(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
-    print("AI COACH ROUTE HIT")
     total = db.query(func.sum(models.Transaction.amount))\
         .filter(models.Transaction.user_id == user.id).scalar() or 0
 

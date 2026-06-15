@@ -1,4 +1,6 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { sendChatMessage } from "../api/api";
 
 function ChatBox() {
@@ -9,7 +11,6 @@ function ChatBox() {
     if (!input.trim()) return;
 
     const userMsg = { role: "user", text: input };
-
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
 
@@ -18,14 +19,14 @@ function ChatBox() {
 
       const botMsg = {
         role: "bot",
-        text: res.response
+        text: res.response,
       };
 
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "Error: AI unavailable" }
+        { role: "bot", text: "Error: AI unavailable" },
       ]);
     }
   };
@@ -35,7 +36,13 @@ function ChatBox() {
       <div className="chat-window">
         {messages.map((m, i) => (
           <div key={i} className={m.role}>
-            {m.text}
+            {m.role === "bot" ? (
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {m.text}
+              </ReactMarkdown>
+            ) : (
+              m.text
+            )}
           </div>
         ))}
       </div>
