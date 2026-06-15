@@ -33,10 +33,6 @@ function Account() {
           <strong>{user.phone}</strong>
         </div>
 
-        <div className="account-row">
-          <span>Bank name</span>
-          <strong>{user.bankName}</strong>
-        </div>
       </div>
     </div>
   );

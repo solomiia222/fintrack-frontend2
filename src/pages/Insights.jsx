@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import InsightCard from "../components/InsightCard";
+import ChatBox from "../components/ChatBox";
 import { getAiReport, getBudgetSuggestions } from "../api/api";
 
 function Insights() {
@@ -42,6 +43,11 @@ function Insights() {
           text={suggestions}
           type="warning"
         />
+      </div>
+
+      <div className="chat-section">
+        <h2>AI Financial Coach</h2>
+        <ChatBox />
       </div>
     </div>
   );

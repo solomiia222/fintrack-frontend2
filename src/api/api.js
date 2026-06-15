@@ -176,3 +176,37 @@ export async function getBudgetSuggestions() {
 
   return readResponse(response, "Failed to load budget suggestions");
 }
+
+export const sendChatMessage = async (message) => {
+  const response = await fetch(`${API_URL}/ai/coach`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify({ message })
+  });
+
+  return readResponse(response, "Chat failed");
+};
+
+export const getUserProfile = async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/users/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+    return;
+  }
+
+  if (!res.ok) throw new Error("Request failed");
+
+  return res.json();
+};

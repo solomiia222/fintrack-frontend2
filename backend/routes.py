@@ -15,6 +15,7 @@ from auth import hash_password, verify_password, create_access_token
 from services import categorize
 from ai import generate_ai_response
 from db import SessionLocal
+from pydantic import BaseModel
 
 
 router = APIRouter()
@@ -77,6 +78,14 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
     token = create_access_token({"sub": db_user.email})
     return {"access_token": token}
+
+
+@router.get("/users/me")
+def get_me(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    return user
 
 
 @router.post("/transactions")
@@ -424,10 +433,13 @@ def predict_spending(
     }
 
 
+class ChatRequest(BaseModel):
+    message: str
+
 @router.post("/ai/coach")
 def financial_coach(
-    message: str,
-    db: Session = Depends(lambda: SessionLocal()),
+    data: ChatRequest,
+    db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
     total = db.query(func.sum(models.Transaction.amount))\
@@ -448,17 +460,19 @@ Category breakdown:
 {categories}
 
 User question:
-{message}
+{data.message}
 """
 
-    response = generate_ai_response(context)
-
-    return {"response": response}
+    try:
+        response = generate_ai_response(context)
+        return {"response": response}
+    except Exception as e:
+        return {"response": "AI service temporarily unavailable."}
 
 
 @router.get("/ai/report")
 def monthly_report(
-    db: Session = Depends(lambda: SessionLocal()),
+    db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
     monthly = db.query(
@@ -494,7 +508,7 @@ Make it short, clear, and user friendly.
 
 @router.get("/ai/budget-suggestions")
 def budget_suggestions(
-    db: Session = Depends(lambda: SessionLocal()),
+    db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
     categories = db.query(

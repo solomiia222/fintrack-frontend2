@@ -125,16 +125,6 @@ function Register() {
           </div>
 
           <div className="form-group">
-            <label>Bank name</label>
-            <input
-              name="bankName"
-              type="text"
-              value={formData.bankName}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-group">
             <label>Password</label>
             <input
               name="password"
