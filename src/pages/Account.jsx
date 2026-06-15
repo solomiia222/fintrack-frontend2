@@ -28,12 +28,12 @@ function Account() {
       <div className="account-card">
         <div className="account-row">
           <span>Name</span>
-          <strong>{user.name}</strong>
+          <strong>{user.first_name}</strong>
         </div>
 
         <div className="account-row">
           <span>Surname</span>
-          <strong>{user.surname}</strong>
+          <strong>{user.last_name}</strong>
         </div>
 
         <div className="account-row">
@@ -43,7 +43,7 @@ function Account() {
 
         <div className="account-row">
           <span>Phone number</span>
-          <strong>{user.phone}</strong>
+          <strong>{user.phone_number}</strong>
         </div>
       </div>
     </div>
