@@ -22,7 +22,7 @@ API_KEYS = [k for k in API_KEYS if k]
 # =========================
 # 2. MODEL POOL
 # =========================
-const MODELS = [
+MODELS = [
     # BEST QUALITY (main reasoning / highest capability)
     "gemini-3.5-flash",
     "gemini-3-flash",
@@ -32,7 +32,7 @@ const MODELS = [
     
     # FAST / CHEAP (high throughput fallback)
     "gemini-2.5-flash-lite",
-    "gemini-3.1-flash-lite",
+    "gemini-3.1-flash-lite"
 ]
 
 
