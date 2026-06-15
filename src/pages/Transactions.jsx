@@ -102,8 +102,8 @@ function Transactions() {
           <label>Category</label>
           <select
             name="category"
-            value={newBudget.category}
-            onChange={handleNewBudgetChange}
+            value={formData.category}
+            onChange={handleChange}
           >
             <option value="">Select category</option>
             {CATEGORIES.map((cat) => (
