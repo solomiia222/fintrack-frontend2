@@ -43,8 +43,23 @@ async function readResponse(response, fallbackMessage) {
   return data;
 }
 
+async function apiFetch(url, options = {}) {
+  const response = await fetch(url, options);
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    window.location.href = "/login";
+
+    throw new Error("Session expired");
+  }
+
+  return response;
+}
+
 export async function registerUser(formData) {
-  const response = await fetch(`${API_URL}/register`, {
+  const response = await apiFetch(`${API_URL}/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -62,7 +77,7 @@ export async function registerUser(formData) {
 }
 
 export async function loginUser(loginData) {
-  const response = await fetch(`${API_URL}/login`, {
+  const response = await apiFetch(`${API_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -74,7 +89,7 @@ export async function loginUser(loginData) {
 }
 
 export async function getTransactions() {
-  const response = await fetch(`${API_URL}/transactions?limit=100`, {
+  const response = await apiFetch(`${API_URL}/transactions?limit=100`, {
     headers: authHeaders(),
   });
 
@@ -82,7 +97,7 @@ export async function getTransactions() {
 }
 
 export async function createTransaction(transaction) {
-  const response = await fetch(`${API_URL}/transactions`, {
+  const response = await apiFetch(`${API_URL}/transactions`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(transaction),
@@ -92,7 +107,7 @@ export async function createTransaction(transaction) {
 }
 
 export async function updateTransaction(transactionId, transaction) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/transactions/${transactionId}`,
     {
       method: "PUT",
@@ -105,7 +120,7 @@ export async function updateTransaction(transactionId, transaction) {
 }
 
 export async function deleteTransaction(transactionId) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/transactions/${transactionId}`,
     {
       method: "DELETE",
@@ -117,7 +132,7 @@ export async function deleteTransaction(transactionId) {
 }
 
 export async function getBudgetAnalytics() {
-  const response = await fetch(`${API_URL}/analytics/budgets`, {
+  const response = await apiFetch(`${API_URL}/analytics/budgets`, {
     headers: authHeaders(),
   });
 
@@ -125,7 +140,7 @@ export async function getBudgetAnalytics() {
 }
 
 export async function saveBudget(category, monthlyLimit) {
-  const response = await fetch(`${API_URL}/budgets`, {
+  const response = await apiFetch(`${API_URL}/budgets`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({
@@ -138,7 +153,7 @@ export async function saveBudget(category, monthlyLimit) {
 }
 
 export async function getPrediction() {
-  const response = await fetch(`${API_URL}/predict/spending`, {
+  const response = await apiFetch(`${API_URL}/predict/spending`, {
     headers: authHeaders(),
   });
 
@@ -146,7 +161,7 @@ export async function getPrediction() {
 }
 
 export async function getMonthlyAnalytics() {
-  const response = await fetch(`${API_URL}/analytics/monthly`, {
+  const response = await apiFetch(`${API_URL}/analytics/monthly`, {
     headers: authHeaders(),
   });
 
@@ -154,7 +169,7 @@ export async function getMonthlyAnalytics() {
 }
 
 export async function getAnalytics() {
-  const response = await fetch(`${API_URL}/analytics/categories`, {
+  const response = await apiFetch(`${API_URL}/analytics/categories`, {
     headers: authHeaders(),
   });
 
@@ -162,7 +177,7 @@ export async function getAnalytics() {
 }
 
 export async function getAiReport() {
-  const response = await fetch(`${API_URL}/ai/report`, {
+  const response = await apiFetch(`${API_URL}/ai/report`, {
     headers: authHeaders(),
   });
 
@@ -170,7 +185,7 @@ export async function getAiReport() {
 }
 
 export async function getBudgetSuggestions() {
-  const response = await fetch(`${API_URL}/ai/budget-suggestions`, {
+  const response = await apiFetch(`${API_URL}/ai/budget-suggestions`, {
     headers: authHeaders(),
   });
 
@@ -178,7 +193,7 @@ export async function getBudgetSuggestions() {
 }
 
 export const sendChatMessage = async (message) => {
-  const res = await fetch(`${API_URL}/ai/coach`, {
+  const res = await apiFetch(`${API_URL}/ai/coach`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({
@@ -192,7 +207,7 @@ export const sendChatMessage = async (message) => {
 export const getUserProfile = async () => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API_URL}/users/me`, {
+  const res = await apiFetch(`${API_URL}/users/me`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
