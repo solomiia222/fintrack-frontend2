@@ -25,7 +25,7 @@ API_KEYS = [k for k in API_KEYS if k]
 MODELS = [
     # BEST QUALITY (main reasoning / highest capability)
     "gemini-3.5-flash",
-    "gemini-3-flash",
+    "gemini-3.0-flash",
     
     # BALANCED (main workhorse)
     "gemini-2.5-flash",
