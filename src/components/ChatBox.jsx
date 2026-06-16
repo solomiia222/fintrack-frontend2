@@ -6,10 +6,14 @@ import rehypeKatex from "rehype-katex";
 import { sendChatMessage } from "../api/api";
 
 function ChatBox() {
-  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatRef = useRef(null);
+
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem("chatMessages");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -44,6 +48,10 @@ function ChatBox() {
       behavior: "smooth",
     });
   }, [messages, loading]);
+
+  useEffect(() => {
+    localStorage.setItem("chatMessages", JSON.stringify(messages));
+  }, [messages]);
 
   return (
     <div className="chat-wrapper">

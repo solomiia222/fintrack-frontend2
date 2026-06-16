@@ -500,10 +500,13 @@ th {
 .message {
   padding: 10px 14px;
   border-radius: 14px;
-  max-width: 75%;
+  max-width: 80%;
   font-size: 14px;
   line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   white-space: pre-wrap;
+  word-break: break-word;
   opacity: 1;
   transform: translateY(0);
 }
@@ -514,6 +517,9 @@ th {
   background: #3b82f6;
   color: white;
   border-bottom-right-radius: 4px;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 /* bot bubble */
@@ -522,6 +528,9 @@ th {
   background: #1e293b;
   color: #e2e8f0;
   border-bottom-left-radius: 4px;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 /* input area */
