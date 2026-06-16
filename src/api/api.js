@@ -59,7 +59,7 @@ async function apiFetch(url, options = {}) {
 }
 
 export async function registerUser(formData) {
-  const response = await apiFetch(`${API_URL}/register`, {
+  const response = await fetch(`${API_URL}/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export async function registerUser(formData) {
 }
 
 export async function loginUser(loginData) {
-  const response = await apiFetch(`${API_URL}/login`, {
+  const response = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
