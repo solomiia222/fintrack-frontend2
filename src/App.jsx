@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AuthChoice from "./pages/AuthChoice";
 import Account from "./pages/Account";
+import FloatingChat from "./components/FloatingChat";
 
 function App() {
   const user = localStorage.getItem("user");
@@ -63,6 +64,7 @@ function App() {
         </main>
 
         {user && <Footer />}
+        {user && <FloatingChat />}
       </div>
     </BrowserRouter>
   );
