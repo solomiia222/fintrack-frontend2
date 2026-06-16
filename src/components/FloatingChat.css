@@ -40,8 +40,9 @@
   width: 380px;
   height: 600px;
 
-  background: #fff;
-  border-radius: 20px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
 
   overflow: hidden;
 
