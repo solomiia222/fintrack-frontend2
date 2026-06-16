@@ -46,11 +46,7 @@ function Insights() {
           type="warning"
         />
       </div>
-
-      <div className="chat-section">
-        <h2>AI Financial Coach</h2>
-        <ChatBox />
-      </div>
+      
     </div>
   );
 }

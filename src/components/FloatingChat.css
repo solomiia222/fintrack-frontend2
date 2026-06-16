@@ -52,6 +52,21 @@
     0 20px 50px rgba(0, 0, 0, 0.25);
 
   z-index: 999;
+
+  transform: scale(0.92);
+  opacity: 0;
+  animation: chatPopIn 0.18s ease-out forwards;
+}
+
+@keyframes chatPopIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .chat-header {
