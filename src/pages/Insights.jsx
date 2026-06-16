@@ -6,7 +6,9 @@ import { getAiReport, getBudgetSuggestions } from "../api/api";
 function Insights() {
   const [report, setReport] = useState("");
   const [suggestions, setSuggestions] = useState("");
-  const [loading, setLoading] = useState(true);
+
+  const [reportLoading, setReportLoading] = useState(true);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(true);
 
   useEffect(() => {
     const loadReport = async () => {
@@ -47,28 +49,19 @@ function Insights() {
         AI-generated financial analysis based on your real transaction data.
       </p>
 
-      {loading ? (
-        <div className="loading-state">
-          <div className="spinner" />
-          <p>Generating your insights...</p>
-        </div>
-      ) : (
-        <>
-          <div className="insights-grid">
-            <InsightCard
-              title="Monthly Financial Report"
-              text={report}
-              type="normal"
-            />
+      <div className="insights-grid">
+        <InsightCard
+          title="Monthly Financial Report"
+          text={reportLoading ? "Loading..." : report}
+          type="normal"
+        />
 
-            <InsightCard
-              title="Budget Suggestions"
-              text={suggestions}
-              type="warning"
-            />
-          </div>
-        </>
-      )}
+        <InsightCard
+          title="Budget Suggestions"
+          text={suggestionsLoading ? "Loading..." : suggestions}
+          type="warning"
+        />
+      </div>
     </div>
   );
 }
